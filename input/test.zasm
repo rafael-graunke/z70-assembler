@@ -1,0 +1,6 @@
+INC A
+SHL A
+SHL A
+SHL A
+INC B
+NOP
