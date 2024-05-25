@@ -82,6 +82,26 @@ uint8_t parse_operation(char *instruction, int *opcount)
     }
 }
 
+uint8_t parse_constant(char *constant)
+{
+    uint8_t c = 0x00;
+    char first, second;
+    first = toupper(constant[0]);
+    second = toupper(constant[1]);
+
+    if (first > 'A' && first < 'F')
+        c += (first - 'A' + 0xA) << 4;
+    else
+        c += (first - '0') << 4;
+
+    if (second > 'A' && second < 'F')
+        c += (second - 'A' + 0xA);
+    else
+        c += (second - '0');
+
+    return c;
+}
+
 uint8_t parse_single_address(char *operand)
 {
     char *op = strupper(operand);
@@ -89,23 +109,84 @@ uint8_t parse_single_address(char *operand)
     {
     case 'A':
         return 0;
-        break;
     case 'B':
         return 1;
-        break;
     case 'I':
         return 2;
-        break;
     case '[':
         return 4;
-        break;
+    }
+}
+
+uint8_t parse_operand_address(char *operand, bool *has_imediate, uint8_t *imediate)
+{
+    char *op = strupper(operand);
+    char constant[2];
+    switch (op[0])
+    {
+    case 'A':
+        return A;
+    case 'B':
+        return B;
+    case 'I':
+        return I;
+    case '[':
+        if (op[1] != 'I')
+        {
+            *has_imediate = true;
+            constant[0] = op[1];
+            constant[1] = op[2];
+            *imediate = parse_constant(constant);
+            return M;
+        }
+        return MI;
+    default:
+        *has_imediate = true;
+        strncpy(constant, op, 2);
+        *imediate = parse_constant(constant);
+        return C;
     }
 }
 
 uint8_t parse_address(int opcount, char *operands, bool *has_imediate, uint8_t *imediate)
 {
+
+    /*This matrix allows mapping the individual operand address
+    to their combination e.g A = 0 and B = 1, then lookup[0][1]
+    should have the correct value for the addressing mode.*/
+    uint8_t lookup[6][6] = {
+        {0xFF, 0x0, 0x2, 0x6, 0xA, 0x4},
+        {0x1, 0xFF, 0xFF, 0x7, 0xB, 0xFF},
+        {0x3, 0xFF, 0xFF, 0x8, 0xFF, 0xFF},
+        {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
+        {0xC, 0xD, 0xFF, 0xFF, 0xFF, 0xFF},
+        {0x5, 0xFF, 0xFF, 0x9, 0xFF, 0xFF}};
+
     if (opcount == 1)
         return parse_single_address(operands);
 
-    // WIP
+    char curr;
+    bool reached_second = false;
+    char buffer[BUFFER_SIZE] = {0};
+    uint8_t from, to;
+    int length = strlen(operands);
+    for (int i = 0; i < length; i++)
+    {
+        curr = operands[i];
+
+        if (curr == ' ')
+            continue;
+
+        if (curr == ',')
+        {
+            reached_second = true;
+            from = parse_operand_address(buffer, has_imediate, imediate);
+            memset(buffer, 0, BUFFER_SIZE);
+            continue;
+        }
+        strncat(buffer, &curr, 1);
+    }
+    to = parse_operand_address(buffer, has_imediate, imediate);
+
+    return lookup[from][to];
 }

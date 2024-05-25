@@ -15,7 +15,7 @@ int assemble(FILE *source, FILE *target)
 {
     int state = SKIP_START;
     bool running = true;
-    char buffer[MAX_BUFF_SIZE] = {0};
+    char buffer[BUFFER_SIZE] = {0};
     char curr;
     int opcount;
     uint8_t operation;
@@ -60,7 +60,7 @@ int assemble(FILE *source, FILE *target)
 
         case OPERATION:
             operation = parse_operation(buffer, &opcount);
-            memset(buffer, 0, MAX_BUFF_SIZE);
+            memset(buffer, 0, BUFFER_SIZE);
 
             if (opcount == 0)
             {
@@ -96,10 +96,11 @@ int assemble(FILE *source, FILE *target)
             fwrite(&instruction, sizeof(instruction), 1, target);
 
             if (has_imediate)
-                fwrite(&has_imediate, sizeof(has_imediate), 1, target);
+                fwrite(&imediate, sizeof(imediate), 1, target);
 
             state = SKIP_START;
-            memset(buffer, 0, MAX_BUFF_SIZE);
+            has_imediate = false;
+            memset(buffer, 0, BUFFER_SIZE);
             break;
         }
     }

@@ -4,6 +4,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define BUFFER_SIZE 20
+
+// Hashed Instructions
 #define ADD 0x4188
 #define SUB 0x5397
 #define CMP 0x439d
@@ -22,6 +25,14 @@
 #define JP 0x4aa0
 #define MOV 0x4da5
 #define NOP 0x4e9f
+
+// Addresses
+#define A 0x0
+#define B 0x1
+#define I 0x2
+#define C 0x3
+#define M 0x4
+#define MI 0x5
 
 typedef uint16_t HASH;
 
