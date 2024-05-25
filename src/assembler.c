@@ -40,20 +40,14 @@ int assemble(FILE *source, FILE *target)
         case FIRST_STRING:
             curr = fgetc(source);
 
-            if (curr == ':')
+            switch(curr)
             {
+            case ':':
                 state = TAG_FOUND;
                 continue;
-            }
-
-            if (curr == ' ')
-            {
-                state = OPERATION;
-                continue;
-            }
-
-            if (curr == '\n' || curr == EOF)
-            {
+            case ' ':
+            case '\n':
+            case EOF:
                 state = OPERATION;
                 continue;
             }
@@ -84,6 +78,7 @@ int assemble(FILE *source, FILE *target)
             {
                 addressing = parse_address(opcount, buffer, &has_imediate, &imediate);
                 state = RESET;
+                continue;
             }
 
             strncat(buffer, &curr, 1);
