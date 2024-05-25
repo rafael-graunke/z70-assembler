@@ -40,7 +40,7 @@ int assemble(FILE *source, FILE *target)
         case FIRST_STRING:
             curr = fgetc(source);
 
-            switch(curr)
+            switch (curr)
             {
             case ':':
                 state = TAG_FOUND;

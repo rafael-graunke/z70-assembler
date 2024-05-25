@@ -3,4 +3,5 @@ MOV B, 10H
 ADD A, B
 INC B
 DEC A
+CMP B, A
 NOP
