@@ -102,16 +102,27 @@ uint8_t parse_constant(char *constant)
 
 uint8_t parse_single_address(char *operand)
 {
-    switch (operand[0])
+    int length = strlen(operand);
+    switch (length)
     {
-    case 'A':
-        return 0;
-    case 'B':
-        return 1;
-    case 'I':
-        return 2;
-    case '[':
-        return 4;
+    case 1:
+        switch (*operand)
+        {
+        case 'A':
+            return A;
+        case 'B':
+            return B;
+        case 'I':
+            return I;
+        default:
+            return 0xFF;
+        }
+    case 3:
+        if (operand[1] == 'I' && operand[0] == '[' && operand[2] == ']')
+            return MI;
+        return 0xFF;
+    default:
+        return 0xFF;
     }
 }
 
@@ -164,25 +175,26 @@ uint8_t parse_operand_address(char *operand, bool *has_imediate, uint8_t *imedia
 uint8_t parse_address(int opcount, char *operands, bool *has_imediate, uint8_t *imediate)
 {
     strupper(operands);
+    if (opcount == 1)
+        return parse_single_address(operands);
+
     /*This matrix allows mapping the individual operand address
     to their combination e.g A = 0 and B = 1, then lookup[0][1]
     should have the correct value for the addressing mode.*/
     uint8_t lookup[6][6] = {
-        {0xFF, 0x0, 0x2, 0x6, 0xA, 0x4},
-        {0x1, 0xFF, 0xFF, 0x7, 0xB, 0xFF},
+        {0xFF, 0x0, 0x2, 0x6, 0x4, 0xA},
+        {0x1, 0xFF, 0xFF, 0x7, 0xFF, 0xB},
         {0x3, 0xFF, 0xFF, 0x8, 0xFF, 0xFF},
         {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
-        {0xC, 0xD, 0xFF, 0xFF, 0xFF, 0xFF},
-        {0x5, 0xFF, 0xFF, 0x9, 0xFF, 0xFF}};
-
-    if (opcount == 1)
-        return parse_single_address(operands);
+        {0x5, 0xFF, 0xFF, 0x9, 0xFF, 0xFF},
+        {0xC, 0xD, 0xFF, 0xFF, 0xFF, 0xFF}};
 
     char curr;
-    bool reached_second = false;
     char buffer[BUFFER_SIZE] = {0};
-    uint8_t from, to;
     int length = strlen(operands);
+    bool reached_second = false;
+    uint8_t from, to;
+
     for (int i = 0; i < length; i++)
     {
         curr = operands[i];
@@ -194,14 +206,14 @@ uint8_t parse_address(int opcount, char *operands, bool *has_imediate, uint8_t *
         {
             reached_second = true;
             if ((from = parse_operand_address(buffer, has_imediate, imediate)) == 0xFF)
-                return 0xFF;
+                return from;
             memset(buffer, 0, BUFFER_SIZE);
             continue;
         }
         strncat(buffer, &curr, 1);
     }
     if ((to = parse_operand_address(buffer, has_imediate, imediate)) == 0xFF)
-        return 0xFF;
+        return to;
 
     return lookup[from][to];
 }

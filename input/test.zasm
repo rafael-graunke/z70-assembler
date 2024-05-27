@@ -1,7 +1,15 @@
-mov A, f0h
-MOV B, 0FH
-add A, B
-MOV I, A0H
-MOV [I], A
-MOV B, [a0h]
+mov a, a0h
+mov b, a0h
+mov i, a0h
+mov a, b
+mov b, a
+mov a, i
+mov i, a
+mov a, [i]
+mov [i], a
+mov [i], ffh
+mov a, [ffh]
+mov b, [ffh]
+mov [ffh], a
+mov [ffh], b
 nop

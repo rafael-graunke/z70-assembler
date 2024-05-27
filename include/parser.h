@@ -31,8 +31,8 @@
 #define B 0x1
 #define I 0x2
 #define C 0x3
-#define M 0x4
-#define MI 0x5
+#define MI 0x4
+#define M 0x5
 
 typedef uint16_t HASH;
 
