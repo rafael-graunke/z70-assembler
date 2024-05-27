@@ -1,7 +1,7 @@
-MOV A, 90H
-MOV B, 10H
-ADD A, B
-INC B
-DEC A
-CMP B, A
-NOP
+mov A, f0h
+MOV B, 0FH
+add A, B
+MOV I, A0H
+MOV [I], A
+MOV B, [a0h]
+nop

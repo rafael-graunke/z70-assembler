@@ -76,7 +76,8 @@ int assemble(FILE *source, FILE *target)
 
             if (curr == '\n')
             {
-                addressing = parse_address(opcount, buffer, &has_imediate, &imediate);
+                if ((addressing = parse_address(opcount, buffer, &has_imediate, &imediate)) == 0XFF)
+                    return EXIT_FAILURE;
                 state = RESET;
                 continue;
             }
