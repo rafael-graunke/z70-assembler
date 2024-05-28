@@ -1,15 +1,13 @@
-mov a, a0h
-mov b, a0h
-mov i, a0h
-mov a, b
-mov b, a
-mov a, i
-mov i, a
-mov a, [i]
-mov [i], a
-mov [i], ffh
-mov a, [ffh]
-mov b, [ffh]
-mov [ffh], a
-mov [ffh], b
-nop
+    mov I, 80H
+    mov A, 01H
+    mov [I], A
+LOOP:
+    inc I
+    mov [I], A
+    dec I
+    add A, [I]
+    jo END
+    inc I
+    jmp LOOP
+END:
+    nop

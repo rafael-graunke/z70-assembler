@@ -9,6 +9,7 @@ SOURCES := $(shell find $(SRCDIR) -name "*.c")
 OBJECTS := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SOURCES))
 INCLUDES := $(addprefix -I,$(INCLUDEDIR))
 
+OUTDIR := out
 BINARY := z70asm
 
 all: $(OBJDIR) $(BINARY)
@@ -25,3 +26,10 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 clean:
 	rm -rf $(OBJDIR) $(BINARY)
 
+
+$(OUTDIR):
+	mkdir $(OUTDIR)
+
+test: $(OUTDIR) $(BINARY)
+	./$(BINARY) input/test.zasm out/output
+ 
