@@ -31,5 +31,5 @@ $(OUTDIR):
 	mkdir $(OUTDIR)
 
 test: $(OUTDIR) $(BINARY)
-	./$(BINARY) input/test.zasm out/output
+	./$(BINARY) input/fib.zasm out/fib.z
  
