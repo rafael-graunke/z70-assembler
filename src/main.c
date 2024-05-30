@@ -29,12 +29,12 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    if (assemble(source, target))
+    if (run(source, target))
     {
         printf("Error assembling code.\n");
         return EXIT_FAILURE;
     }
 
-    printf("Binary assembled to %s.\n", output);
+    printf("Binary assembled to \"%s\".\n", output);
     return EXIT_SUCCESS;
 }

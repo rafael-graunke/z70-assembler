@@ -12,7 +12,7 @@ char *strupper(char *str)
     return str;
 }
 
-HASH hash_instruction(char *instruction)
+uint16_t hash_instruction(char *instruction)
 {
     int lastpos = strlen(instruction) - 1;
     return (instruction[0] << 8) + instruction[1] + instruction[lastpos];
@@ -21,7 +21,7 @@ HASH hash_instruction(char *instruction)
 uint8_t parse_operation(char *instruction, int *opcount)
 {
     strupper(instruction);
-    HASH hash = hash_instruction(instruction);
+    uint16_t hash = hash_instruction(instruction);
 
     switch (hash)
     {

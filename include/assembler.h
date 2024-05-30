@@ -2,6 +2,7 @@
 #define _ASSEMBLER_H_
 
 #include <stdio.h>
+#include "parser.h"
 
 // Assembling States
 #define START 0
@@ -13,6 +14,7 @@
 #define RESET 0xF0
 #define FINISHED 0xFF
 
-int assemble(FILE *source, FILE *target);
+int run(FILE *source, FILE *target);
+int assemble(FILE *source, FILE *target, Map *labels, int *lsize);
 
 #endif

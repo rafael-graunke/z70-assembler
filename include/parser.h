@@ -34,15 +34,13 @@
 #define MI 0x4
 #define M 0x5
 
-typedef uint16_t HASH;
-
 typedef struct s_map
 {
     char label[BUFFER_SIZE];
     int address;
 } Map;
 
-HASH hash_instruction(char *instruction);
+uint16_t hash_instruction(char *instruction);
 uint8_t parse_operation(char *instruction, int *opcount);
 uint8_t parse_address(int opcount, char *operands, bool *has_imediate, uint8_t *imediate);
 
