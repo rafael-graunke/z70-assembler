@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "assembler.h"
+#include "lexer.h"
 #include "parser.h"
 
 int main(int argc, char **argv)
@@ -29,11 +30,14 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    if (run(source, target))
-    {
-        printf("Error assembling code.\n");
-        return EXIT_FAILURE;
-    }
+    // if (run(source, target))
+    // {
+    //     printf("Error assembling code.\n");
+    //     return EXIT_FAILURE;
+    // }
+
+    while (advance(source) != _EOF)
+        ;
 
     printf("Binary assembled to \"%s\".\n", output);
     return EXIT_SUCCESS;
