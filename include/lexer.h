@@ -2,6 +2,7 @@
 #define _LEXER_H_
 
 #include <stdio.h>
+#include "hashmap.h"
 
 /*
     States of the Lexer State Machine.
@@ -14,7 +15,8 @@
 
 #define MAX_LEXEME_SIZE 256
 
-enum token {
+typedef enum toktype
+{
     LABEL = 1,
     INSTRUCTION = 2,
     A_REGISTER = 3,
@@ -24,10 +26,28 @@ enum token {
     OPEN_ADDRESS = 7,
     CLOSE_ADDRESS = 8,
     COMMA = 9,
-    _EOF = 10
-};
+    EOL = 10,
+    COLON = 11,
+    _EOF = 99
+} TokenType;
 
-enum token advance(FILE *f);
-int step(FILE *f);
+typedef struct
+{
+    char lexval[MAX_LEXEME_SIZE];
+    TokenType type;
+} Token;
+
+typedef struct
+{
+    char lexeme_buffer[MAX_LEXEME_SIZE];
+    int state;
+    int lexeme_size;
+    FILE *file;
+    HashMap *symbols;
+} Lexer;
+
+Lexer *create_lexer(FILE *f);
+Token advance(Lexer *lexer);
+int step(Lexer *lexer);
 
 #endif

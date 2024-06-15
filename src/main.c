@@ -36,7 +36,8 @@ int main(int argc, char **argv)
     //     return EXIT_FAILURE;
     // }
 
-    while (advance(source) != _EOF)
+    Lexer *lexer = create_lexer(source);
+    while (advance(lexer).type != _EOF)
         ;
 
     printf("Binary assembled to \"%s\".\n", output);

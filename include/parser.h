@@ -42,6 +42,8 @@ typedef struct s_map
 
 uint16_t hash_instruction(char *instruction);
 uint8_t parse_operation(char *instruction, int *opcount);
+
+uint8_t parse_constant(char *constant);
 uint8_t parse_address(int opcount, char *operands, bool *has_imediate, uint8_t *imediate);
 
 #endif
