@@ -4,27 +4,29 @@
 #include "hashmap.h"
 #include "lexer.h"
 
-void init_symbols(Lexer *lexer)
+HashMap *init_symbols(void)
 {
-    lexer->symbols = create_hashmap(18);
-    hashmap_insert(lexer->symbols, "ADD", 0x00);
-    hashmap_insert(lexer->symbols, "SUB", 0x10);
-    hashmap_insert(lexer->symbols, "CMP", 0x20);
-    hashmap_insert(lexer->symbols, "INC", 0x30);
-    hashmap_insert(lexer->symbols, "DEC", 0x40);
-    hashmap_insert(lexer->symbols, "AND", 0x50);
-    hashmap_insert(lexer->symbols, "OR", 0x60);
-    hashmap_insert(lexer->symbols, "NOT", 0x70);
-    hashmap_insert(lexer->symbols, "SHR", 0x80);
-    hashmap_insert(lexer->symbols, "SHL", 0x90);
-    hashmap_insert(lexer->symbols, "JMP", 0xA0);
-    hashmap_insert(lexer->symbols, "JZ", 0xA1);
-    hashmap_insert(lexer->symbols, "JS", 0xA2);
-    hashmap_insert(lexer->symbols, "JC", 0xA3);
-    hashmap_insert(lexer->symbols, "JO", 0xA4);
-    hashmap_insert(lexer->symbols, "JP", 0xA5);
-    hashmap_insert(lexer->symbols, "MOV", 0xB0);
-    hashmap_insert(lexer->symbols, "NOP", 0xFF);
+    HashMap *hashmap = create_hashmap(18);
+    hashmap_insert(hashmap, "ADD", 0x00);
+    hashmap_insert(hashmap, "SUB", 0x10);
+    hashmap_insert(hashmap, "CMP", 0x20);
+    hashmap_insert(hashmap, "INC", 0x30);
+    hashmap_insert(hashmap, "DEC", 0x40);
+    hashmap_insert(hashmap, "AND", 0x50);
+    hashmap_insert(hashmap, "OR", 0x60);
+    hashmap_insert(hashmap, "NOT", 0x70);
+    hashmap_insert(hashmap, "SHR", 0x80);
+    hashmap_insert(hashmap, "SHL", 0x90);
+    hashmap_insert(hashmap, "JMP", 0xA0);
+    hashmap_insert(hashmap, "JZ", 0xA1);
+    hashmap_insert(hashmap, "JS", 0xA2);
+    hashmap_insert(hashmap, "JC", 0xA3);
+    hashmap_insert(hashmap, "JO", 0xA4);
+    hashmap_insert(hashmap, "JP", 0xA5);
+    hashmap_insert(hashmap, "MOV", 0xB0);
+    hashmap_insert(hashmap, "NOP", 0xFF);
+
+    return hashmap;
 }
 
 void reset_lexer(Lexer *lexer)
@@ -37,11 +39,18 @@ void reset_lexer(Lexer *lexer)
 Lexer *create_lexer(FILE *f)
 {
     Lexer *lexer = (Lexer *)malloc(sizeof(Lexer));
-    init_symbols(lexer);
     lexer->file = f;
+    lexer->symbols = init_symbols();
     reset_lexer(lexer);
 
     return lexer;
+}
+
+void destroy_lexer(Lexer *lexer)
+{
+    destroy_hashmap(lexer->symbols);
+    fclose(lexer->file);
+    free(lexer);
 }
 
 void write_to_lexeme(Lexer *lexer, char c)

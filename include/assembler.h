@@ -14,7 +14,4 @@
 #define RESET 0xF0
 #define FINISHED 0xFF
 
-int run(FILE *source, FILE *target);
-int assemble(FILE *source, FILE *target, Map *labels, int *lsize);
-
 #endif

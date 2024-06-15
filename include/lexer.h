@@ -47,6 +47,7 @@ typedef struct
 } Lexer;
 
 Lexer *create_lexer(FILE *f);
+void destroy_lexer(Lexer *lexer);
 Token advance(Lexer *lexer);
 int step(Lexer *lexer);
 

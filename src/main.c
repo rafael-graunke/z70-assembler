@@ -36,10 +36,10 @@ int main(int argc, char **argv)
     //     return EXIT_FAILURE;
     // }
 
-    Lexer *lexer = create_lexer(source);
-    while (advance(lexer).type != _EOF)
-        ;
+    Parser *parser = create_parser(source);
+    first_pass(parser);
 
+    destroy_parser(parser);
     printf("Binary assembled to \"%s\".\n", output);
     return EXIT_SUCCESS;
 }
