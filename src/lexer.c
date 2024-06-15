@@ -4,27 +4,42 @@
 #include "hashmap.h"
 #include "lexer.h"
 
+typedef struct hm_value
+{
+    int value;
+    int op_count;
+} Mnemonic;
+
+Mnemonic *create_mn(int value, int op_count)
+{
+    Mnemonic *mn = (Mnemonic *)malloc(sizeof(Mnemonic));
+    mn->value = value;
+    mn->op_count = op_count;
+
+    return mn;
+}
+
 HashMap *init_symbols(void)
 {
-    HashMap *hashmap = create_hashmap(18);
-    hashmap_insert(hashmap, "ADD", 0x00);
-    hashmap_insert(hashmap, "SUB", 0x10);
-    hashmap_insert(hashmap, "CMP", 0x20);
-    hashmap_insert(hashmap, "INC", 0x30);
-    hashmap_insert(hashmap, "DEC", 0x40);
-    hashmap_insert(hashmap, "AND", 0x50);
-    hashmap_insert(hashmap, "OR", 0x60);
-    hashmap_insert(hashmap, "NOT", 0x70);
-    hashmap_insert(hashmap, "SHR", 0x80);
-    hashmap_insert(hashmap, "SHL", 0x90);
-    hashmap_insert(hashmap, "JMP", 0xA0);
-    hashmap_insert(hashmap, "JZ", 0xA1);
-    hashmap_insert(hashmap, "JS", 0xA2);
-    hashmap_insert(hashmap, "JC", 0xA3);
-    hashmap_insert(hashmap, "JO", 0xA4);
-    hashmap_insert(hashmap, "JP", 0xA5);
-    hashmap_insert(hashmap, "MOV", 0xB0);
-    hashmap_insert(hashmap, "NOP", 0xFF);
+    HashMap *hashmap = hm_create(18);
+    hm_insert(hashmap, "ADD", create_mn(0x00, 2));
+    hm_insert(hashmap, "SUB", create_mn(0x10, 2));
+    hm_insert(hashmap, "CMP", create_mn(0x20, 2));
+    hm_insert(hashmap, "INC", create_mn(0x30, 1));
+    hm_insert(hashmap, "DEC", create_mn(0x40, 1));
+    hm_insert(hashmap, "AND", create_mn(0x50, 2));
+    hm_insert(hashmap, "OR", create_mn(0x60, 2));
+    hm_insert(hashmap, "NOT", create_mn(0x70, 1));
+    hm_insert(hashmap, "SHR", create_mn(0x80, 1));
+    hm_insert(hashmap, "SHL", create_mn(0x90, 1));
+    hm_insert(hashmap, "JMP", create_mn(0xA0, 1));
+    hm_insert(hashmap, "JZ", create_mn(0xA1, 1));
+    hm_insert(hashmap, "JS", create_mn(0xA2, 1));
+    hm_insert(hashmap, "JC", create_mn(0xA3, 1));
+    hm_insert(hashmap, "JO", create_mn(0xA4, 1));
+    hm_insert(hashmap, "JP", create_mn(0xA5, 1));
+    hm_insert(hashmap, "MOV", create_mn(0xB0, 2));
+    hm_insert(hashmap, "NOP", create_mn(0xFF, 0));
 
     return hashmap;
 }
@@ -48,7 +63,7 @@ Lexer *create_lexer(FILE *f)
 
 void destroy_lexer(Lexer *lexer)
 {
-    destroy_hashmap(lexer->symbols);
+    hm_destroy(lexer->symbols);
     fclose(lexer->file);
     free(lexer);
 }
@@ -82,7 +97,7 @@ Token advance(Lexer *lexer)
     switch (result)
     {
     case LABEL:
-    case INSTRUCTION:
+    case MNEMONIC:
     case CONSTANT:
         strncpy(token.lexval, lexer->lexeme_buffer, MAX_LEXEME_SIZE);
         break;
@@ -113,7 +128,7 @@ int step(Lexer *lexer)
         case 'I':
             char next = toupper(getc(lexer->file));
             fseek(lexer->file, -1, SEEK_CUR);
-            if (!isalpha(next))
+            if (!isalnum(next))
             {
                 switch (cursor)
                 {
@@ -173,8 +188,8 @@ int step(Lexer *lexer)
             if (cursor == '\n')
                 fseek(lexer->file, -1, SEEK_CUR);
 
-            if (hashmap_fetch(lexer->symbols, lexer->lexeme_buffer) != -1)
-                return INSTRUCTION;
+            if (hm_fetch(lexer->symbols, lexer->lexeme_buffer) != NULL)
+                return MNEMONIC;
             return LABEL;
         }
 

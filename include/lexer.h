@@ -18,7 +18,7 @@
 typedef enum toktype
 {
     LABEL = 1,
-    INSTRUCTION = 2,
+    MNEMONIC = 2,
     A_REGISTER = 3,
     B_REGISTER = 4,
     I_REGISTER = 5,

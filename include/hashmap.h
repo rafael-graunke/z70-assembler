@@ -6,9 +6,11 @@
 
 #define MAX_KEY_SIZE 255
 
+struct hm_value;
+
 typedef struct
 {
-    int value;
+    struct hm_value *value;
     char key[MAX_KEY_SIZE];
 } HashmapNode;
 
@@ -19,9 +21,9 @@ typedef struct
     int size;
 } HashMap;
 
-HashMap *create_hashmap(int size);
-void destroy_hashmap(HashMap *hashmap);
-bool hashmap_insert(HashMap *hashmap, char *key, int value);
-int hashmap_fetch(HashMap *hashmap, char *key);
+HashMap *hm_create(int size);
+void hm_destroy(HashMap *hashmap);
+bool hm_insert(HashMap *hashmap, char *key, struct hm_value *value);
+struct hm_value *hm_fetch(HashMap *hashmap, char *key);
 
 #endif

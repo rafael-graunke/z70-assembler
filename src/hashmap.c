@@ -14,7 +14,7 @@ unsigned long hash(unsigned char *str)
     return hash;
 }
 
-HashMap *create_hashmap(int size)
+HashMap *hm_create(int size)
 {
     HashMap *hashmap = (HashMap *)malloc(sizeof(HashMap));
     if (hashmap == NULL)
@@ -35,17 +35,22 @@ HashMap *create_hashmap(int size)
     return hashmap;
 }
 
-void destroy_hashmap(HashMap *hashmap)
+void hm_destroy(HashMap *hashmap)
 {
     for (int i = 0; i < hashmap->size; i++)
         if (hashmap->entries[i] != NULL)
+        {
+            if (hashmap->entries[i]->value != NULL)
+                free(hashmap->entries[i]->value);
+
             free(hashmap->entries[i]);
+        }
 
     free(hashmap->entries);
     free(hashmap);
 }
 
-bool hashmap_insert(HashMap *hashmap, char *key, int value)
+bool hm_insert(HashMap *hashmap, char *key, struct hm_value *value)
 {
     int pos = hash(key) % hashmap->size;
     int first_pos = pos;
@@ -66,7 +71,7 @@ bool hashmap_insert(HashMap *hashmap, char *key, int value)
     return true;
 }
 
-int hashmap_fetch(HashMap *hashmap, char *key)
+struct hm_value *hm_fetch(HashMap *hashmap, char *key)
 {
     int pos = hash(key) % hashmap->size;
     int first_pos = pos;
@@ -74,7 +79,7 @@ int hashmap_fetch(HashMap *hashmap, char *key)
     {
         pos = (pos + 1) % hashmap->size;
         if (pos == first_pos)
-            return -1;
+            return NULL;
     }
 
     return hashmap->entries[pos]->value;
