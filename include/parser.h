@@ -12,14 +12,9 @@
     TODO: check this again
     This is a brief grammar definition for the Z70 Assembly
 
-    bin -> {line} EOL
-    line -> (instruction | label_declaration) EOL
-    instruction -> [label_declaration] MNEMONIC [operands]
-    label_declaration -> LABEL COLON
-    operands -> (operands COMMA) | operand
-    operand -> CONSTANT | register | memory_addr
-    register -> A_REGISTER | B_REGISTER | I_REGISTER
-    memory_addr -> OPEN_ADDRESS (I_REGISTER | CONSTANT) CLOSE_ADDRESS
+    line -> (LABEL COLON | MNEMONIC operators) EOL
+    operators -> memory_address | CONSTANT | REGISTER | empty
+    memory_address -> OPEN_ADDRESS (REGISTER | CONSTANT) CLOSE_ADDRESS
 */
 
 typedef struct
@@ -27,10 +22,13 @@ typedef struct
     HashMap *labels;
     HashMap *addressing;
     Lexer *lexer;
+    Token lookahead;
+    FILE *target;
 } Parser;
 
-Parser *create_parser(FILE *file);
+Parser *create_parser(FILE *source, FILE *target);
 void destroy_parser(Parser *parser);
-void first_pass(Parser *parser); // TODO: remove this
+void first_pass(Parser *parser);  // TODO: remove this
+void second_pass(Parser *parser); // TODO: remove this
 
 #endif

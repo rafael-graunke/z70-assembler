@@ -2,6 +2,7 @@
 #define _LEXER_H_
 
 #include <stdio.h>
+#include <stdint.h>
 #include "hashmap.h"
 
 /*
@@ -15,20 +16,24 @@
 
 #define MAX_LEXEME_SIZE 256
 
+typedef struct mnemonic
+{
+    uint8_t value;
+    int op_count;
+} Mnemonic;
+
 typedef enum toktype
 {
     LABEL = 1,
     MNEMONIC = 2,
-    A_REGISTER = 3,
-    B_REGISTER = 4,
-    I_REGISTER = 5,
-    CONSTANT = 6,
-    OPEN_ADDRESS = 7,
-    CLOSE_ADDRESS = 8,
-    COMMA = 9,
-    EOL = 10,
-    COLON = 11,
-    _EOF = 99
+    REGISTER = 3,
+    CONSTANT = 4,
+    OPEN_ADDRESS = 5,
+    CLOSE_ADDRESS = 6,
+    COMMA = 7,
+    EOL = 8,
+    COLON = 9,
+    _EOF = 10
 } TokenType;
 
 typedef struct
@@ -46,9 +51,9 @@ typedef struct
     HashMap *symbols;
 } Lexer;
 
-Lexer *create_lexer(FILE *f);
-void destroy_lexer(Lexer *lexer);
-Token advance(Lexer *lexer);
-int step(Lexer *lexer);
+Lexer *lx_create(FILE *f);
+void lx_destroy(Lexer *lexer);
+Mnemonic *mn_fetch(Lexer *lexer, char *key);
+Token lx_advance(Lexer *lexer);
 
 #endif

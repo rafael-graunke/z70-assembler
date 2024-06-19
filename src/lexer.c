@@ -4,12 +4,6 @@
 #include "hashmap.h"
 #include "lexer.h"
 
-typedef struct hm_value
-{
-    int value;
-    int op_count;
-} Mnemonic;
-
 Mnemonic *create_mn(int value, int op_count)
 {
     Mnemonic *mn = (Mnemonic *)malloc(sizeof(Mnemonic));
@@ -17,6 +11,11 @@ Mnemonic *create_mn(int value, int op_count)
     mn->op_count = op_count;
 
     return mn;
+}
+
+Mnemonic *mn_fetch(Lexer *lexer, char *key)
+{
+    return (Mnemonic *)hm_fetch(lexer->symbols, key);
 }
 
 HashMap *init_symbols(void)
@@ -51,7 +50,7 @@ void reset_lexer(Lexer *lexer)
     memset(lexer->lexeme_buffer, 0, MAX_LEXEME_SIZE);
 }
 
-Lexer *create_lexer(FILE *f)
+Lexer *lx_create(FILE *f)
 {
     Lexer *lexer = (Lexer *)malloc(sizeof(Lexer));
     lexer->file = f;
@@ -61,7 +60,7 @@ Lexer *create_lexer(FILE *f)
     return lexer;
 }
 
-void destroy_lexer(Lexer *lexer)
+void lx_destroy(Lexer *lexer)
 {
     hm_destroy(lexer->symbols);
     fclose(lexer->file);
@@ -81,31 +80,6 @@ void write_to_lexeme(Lexer *lexer, char c)
     lexer->lexeme_buffer[lexer->lexeme_size] = '\0';
 }
 
-Token advance(Lexer *lexer)
-{
-    reset_lexer(lexer);
-    int result;
-    while ((result = step(lexer)) == 0)
-        ;
-
-    Token token;
-    token.type = result;
-
-    if (result == _EOF)
-        return token;
-
-    switch (result)
-    {
-    case LABEL:
-    case MNEMONIC:
-    case CONSTANT:
-        strncpy(token.lexval, lexer->lexeme_buffer, MAX_LEXEME_SIZE);
-        break;
-    }
-
-    return token;
-}
-
 int step(Lexer *lexer)
 {
     char cursor = toupper(getc(lexer->file));
@@ -121,6 +95,7 @@ int step(Lexer *lexer)
         if (isspace(cursor))
             break;
 
+        write_to_lexeme(lexer, cursor);
         switch (cursor)
         {
         case 'A':
@@ -129,18 +104,7 @@ int step(Lexer *lexer)
             char next = toupper(getc(lexer->file));
             fseek(lexer->file, -1, SEEK_CUR);
             if (!isalnum(next))
-            {
-                switch (cursor)
-                {
-                case 'A':
-                    return A_REGISTER;
-                case 'B':
-                    return B_REGISTER;
-                case 'I':
-                    return I_REGISTER;
-                }
-            }
-            write_to_lexeme(lexer, cursor);
+                return REGISTER;
             lexer->state = READING;
             break;
         case '[':
@@ -154,7 +118,6 @@ int step(Lexer *lexer)
         default:
             if (isalnum(cursor))
             {
-                write_to_lexeme(lexer, cursor);
                 lexer->state = READING;
                 break;
             }
@@ -204,4 +167,22 @@ int step(Lexer *lexer)
     }
 
     return 0;
+}
+
+Token lx_advance(Lexer *lexer)
+{
+    reset_lexer(lexer);
+    int result;
+    while ((result = step(lexer)) == 0)
+        ;
+
+    Token token;
+    token.type = result;
+
+    if (result == _EOF)
+        return token;
+
+    strncpy(token.lexval, lexer->lexeme_buffer, MAX_LEXEME_SIZE);
+
+    return token;
 }

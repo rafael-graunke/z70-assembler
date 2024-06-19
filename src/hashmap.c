@@ -50,7 +50,7 @@ void hm_destroy(HashMap *hashmap)
     free(hashmap);
 }
 
-bool hm_insert(HashMap *hashmap, char *key, struct hm_value *value)
+bool hm_insert(HashMap *hashmap, char *key, void *value)
 {
     int pos = hash(key) % hashmap->size;
     int first_pos = pos;
@@ -71,7 +71,7 @@ bool hm_insert(HashMap *hashmap, char *key, struct hm_value *value)
     return true;
 }
 
-struct hm_value *hm_fetch(HashMap *hashmap, char *key)
+void *hm_fetch(HashMap *hashmap, char *key)
 {
     int pos = hash(key) % hashmap->size;
     int first_pos = pos;

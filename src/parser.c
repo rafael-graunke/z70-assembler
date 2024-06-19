@@ -45,10 +45,10 @@ HashMap *init_addressing(void)
     return hashmap;
 }
 
-Parser *create_parser(FILE *file)
+Parser *create_parser(FILE *source, FILE *target)
 {
     Parser *parser = (Parser *)malloc(sizeof(Parser));
-    parser->lexer = create_lexer(file);
+    parser->lexer = lx_create(source);
     parser->labels = hm_create(MAX_LABELS_AMOUNT);
     parser->addressing = init_addressing();
 
@@ -57,7 +57,7 @@ Parser *create_parser(FILE *file)
 
 void destroy_parser(Parser *parser)
 {
-    destroy_lexer(parser->lexer);
+    lx_destroy(parser->lexer);
     hm_destroy(parser->labels);
     hm_destroy(parser->addressing);
     free(parser);
@@ -67,7 +67,7 @@ void first_pass(Parser *parser)
 {
     int address = 0;
     Token token;
-    while ((token = advance(parser->lexer)).type != _EOF)
+    while ((token = lx_advance(parser->lexer)).type != _EOF)
     {
         if (token.type == MNEMONIC || token.type == CONSTANT)
         {
@@ -75,7 +75,7 @@ void first_pass(Parser *parser)
             continue;
         }
 
-        if (token.type == LABEL && (token = advance(parser->lexer)).type == COLON)
+        if (token.type == LABEL && (token = lx_advance(parser->lexer)).type == COLON)
             hm_insert(parser->labels, token.lexval, create_addr(address));
     }
 
@@ -84,5 +84,4 @@ void first_pass(Parser *parser)
 
 void second_pass(Parser *parser)
 {
-
 }
